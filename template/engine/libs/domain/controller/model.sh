@@ -461,7 +461,7 @@ function mod_create_base_system () {
 function mod_create_basic_system () {
 
 	##
-	## debootstrap + base settings + linuxmint apt-sources
+	## debootstrap + base settings
 	##
 
 
@@ -512,7 +512,7 @@ function mod_create_basic_system () {
 function mod_create_full_system () {
 
 	##
-	## debootstrap + base settings + linuxmint apt-sources + extra
+	## debootstrap + base settings + extra
 	##
 
 
@@ -679,93 +679,11 @@ EOF
 
 }
 
-##
-## * https://github.com/clefebvre/docker-images
-## * https://github.com/clefebvre/docker-images/blob/master/mint27-amd64.Dockerfile
-## * https://github.com/clefebvre/docker-images/tree/master/mint27/etc/apt
-##
-
-function sys_add_linuxmint_keyring () {
-
-	local keyring_deb_file_name="linuxmint-keyring_2022.06.21_all.deb"
-
-	print_info "Install gnupg for linuxmint-keyring ..."
-	chroot "${DISTRO_IMG_DIR_PATH}" apt install -y --install-recommends gnupg
-	judge "Install gnupg for linuxmint-keyring"
-
-	mkdir -p "${DISTRO_IMG_DIR_PATH}/tmp"
-	wget -c "http://packages.linuxmint.com/pool/main/l/linuxmint-keyring/${keyring_deb_file_name}" -O "${DISTRO_IMG_DIR_PATH}/tmp/${keyring_deb_file_name}"
-
-	print_info "Install LinuxMint GPG keyring ..."
-	chroot "${DISTRO_IMG_DIR_PATH}" dpkg -i "/tmp/${keyring_deb_file_name}"
-	judge "Install LinuxMint GPG keyring"
-
-	rm -f "${DISTRO_IMG_DIR_PATH}/tmp/${keyring_deb_file_name}"
-
-}
-
-function sys_add_linuxmint_apt_sources () {
-
-	print_info "Install LinuxMint apt sources ..."
-	mkdir -p "${DISTRO_IMG_DIR_PATH}/etc/apt/sources.list.d"
-cat << __EOF__ | tee "${DISTRO_IMG_DIR_PATH}/etc/apt/sources.list.d/linuxmint.sources" > /dev/null 2>&1
-Types: deb
-URIs: ${PKG_SERVER}
-Suites: adrien
-Components: main upstream import backport
-Architectures: amd64
-Signed-By: /etc/apt/trusted.gpg.d/linuxmint-keyring.gpg
-__EOF__
-	judge "Install LinuxMint apt sources"
-
-}
-
-function sys_add_linuxmint_apt_preferences () {
-
-	print_info "Config LinuxMint apt preferences ..."
-	mkdir -p "${DISTRO_IMG_DIR_PATH}/etc/apt/preferences.d"
-cat << __EOF__ | tee "${DISTRO_IMG_DIR_PATH}/etc/apt/preferences.d/linuxmint.pref"  > /dev/null 2>&1
-Package: *
-Pin: origin live.linuxmint.com
-Pin-Priority: 750
-
-Package: *
-Pin: release o=linuxmint,c=upstream
-Pin-Priority: 700
-__EOF__
-	judge "Config LinuxMint apt preferences"
-
-}
-
-function sys_config_apt_sources_list_for_linuxmint () {
-
-	print_info "Setting up LinuxMint apt sources in chroot ..."
-
-	sys_add_linuxmint_keyring
-
-	sys_add_linuxmint_apt_sources
-
-	sys_add_linuxmint_apt_preferences
-
-	judge "Setting up LinuxMint apt sources"
-
-}
-
 function sys_config_apt_for_ubuntu () {
 
 	sys_config_apt_install_enable_recommends
 
 	sys_config_apt_sources_list_for_ubuntu
-
-}
-
-function sys_config_apt_for_linuxmint () {
-
-	sys_config_apt_install_enable_recommends
-
-	sys_config_apt_sources_list_for_ubuntu
-
-	sys_config_apt_sources_list_for_linuxmint
 
 }
 
@@ -777,15 +695,6 @@ function sys_setup_apt_for_ubuntu () {
 	sys_chroot_run_apt_upgrade
 
 }
-
-function sys_setup_apt_for_linuxmint () {
-
-	sys_config_apt_for_linuxmint
-
-	sys_chroot_run_apt_update
-	sys_chroot_run_apt_upgrade
-}
-
 
 function mod_setup_apt_for_core_system () {
 
@@ -801,13 +710,13 @@ function mod_setup_apt_for_base_system () {
 
 function mod_setup_apt_for_basic_system () {
 
-	sys_setup_apt_for_linuxmint
+	sys_setup_apt_for_ubuntu
 
 }
 
 function mod_setup_apt_for_full_system () {
 
-	sys_setup_apt_for_linuxmint
+	sys_setup_apt_for_ubuntu
 
 }
 
