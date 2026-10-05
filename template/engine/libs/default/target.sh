@@ -32,7 +32,7 @@ TARGET_UBUNTU_VERSION="resolute"
 #   amd64 — Intel / AMD 64-bit
 #   arm64 — ARM 64-bit (Raspberry Pi, Snapdragon, Apple Silicon, etc.)
 #TARGET_ARCH="$(dpkg --print-architecture)"
-TARGET_ARCH=amd64
+TARGET_ARCH="amd64"
 
 # This is the name of the target OS.
 # Must be lowercase without special characters and spaces
@@ -61,14 +61,3 @@ TARGET_PACKAGE_REMOVE="
 	os-prober \
 	gparted \
 "
-
-################################################################################
-# LinuxMint PKG server configuration
-################################################################################
-
-# PKG server URL for LinuxMint-branded overlay packages.
-PKG_SERVER="http://packages.linuxmint.com"
-
-# GPG certificate name on the PKG server (used to download and verify the repo).
-# The cert is fetched from: ${PKG_SERVER}/artifacts/certs/${PKG_CERT_NAME}
-PKG_CERT_NAME="linuxmint"
