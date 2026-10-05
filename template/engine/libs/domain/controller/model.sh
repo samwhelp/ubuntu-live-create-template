@@ -59,7 +59,6 @@ function raw_building_var_dump () {
 	echo "TARGET_NAME=${TARGET_NAME}"
 	echo "TARGET_BUSINESS_NAME=${TARGET_BUSINESS_NAME}"
 	echo "TARGET_BUILD_VERSION=${TARGET_BUILD_VERSION}"
-	echo "PKG_SERVER=${PKG_SERVER}"
 
 }
 
